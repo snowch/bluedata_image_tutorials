@@ -1,4 +1,10 @@
 #!/usr/bin/env bdwb
+
+# Increment both versions every time you update the image
+
+define var APP_VERSION=10.0
+define var IMAGE_VERSION=1.0
+
 #########################################################
 #  Specify organization name for Apps (Required)        #
 #########################################################
@@ -16,9 +22,10 @@ builder organization --name Bluedata
 ######## Identification #############
 # App id, name, version, description, group (category)
 ######################################
+
 catalog new --distroid Helloworld --name "Hello World on Centos"  \
             --desc "http service running Hello World page"    \
-            --categories Greetings --version 10.0
+            --categories Greetings --version %APP_VERSION%
 
 ####### Supported Roles ############
 # All possible roles supported in the app
@@ -58,7 +65,7 @@ appconfig autogen --new --configapi 5
 # These files are stored in a metadata repo until cluster creation 
 # After a cluster is created, it will be copied to specified destinations
 ############
-appconfig autogen --pkgfile index.html --dest /var/www/html/index.html
+appconfig autogen --pkgfile index.html --dest /var/www/html/index.html \
                   --onroles webserver controller worker
 
 ########### Update files with runtime information ############
@@ -67,7 +74,7 @@ appconfig autogen --pkgfile index.html --dest /var/www/html/index.html
 appconfig autogen --replace /var/www/html/index.html \
                   --pattern @@@@FQDN@@@@  --macro GET_NODE_FQDN  \
                   --pattern @@@@CORES@@@@ --macro GET_TOTAL_VCORES \
-                  --pattern @@@@MEMORY@@@@ --macro GET_TOTAL_VMEMORY_MB
+                  --pattern @@@@MEMORY@@@@ --macro GET_TOTAL_VMEMORY_MB \
                   --onroles webserver controller worker
 
 ########### Copy init.d or systemctl (service) scripts to /etc/init.d ####
@@ -93,8 +100,8 @@ logo file --filepath helloworld-logo.png
 ################### Final bin package creation ###############################
 #  This section creates docker tgz and bin file                              #
 ##############################################################################
-image build --basedir image/centos --image-repotag bluedata/helloworld:1.0
-image package --image-repotag bluedata/helloworld:1.0 --os centos7  --roles webserver controller worker
+image build --basedir image/centos --image-repotag bluedata/helloworld:%IMAGE_VERSION%
+image package --image-repotag bluedata/helloworld:%IMAGE_VERSION% --os centos7  --roles webserver controller worker
 
 
 #image build --basedir image/centos --image-repotag bluedata/helloworld
